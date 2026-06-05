@@ -4,11 +4,25 @@ const cors = require("cors")
 
 const app = express()
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://ai-interview-and-resume-analyser.vercel.app",
+    process.env.FRONTEND_URL,
+].filter(Boolean)
+
+app.set("trust proxy", 1)
+
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
+    credentials: true,
 }))
 
 /* require all the routes here */
